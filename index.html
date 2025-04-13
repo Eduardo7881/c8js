@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>C8.(js)</title>
+</head>
+<body>
+    <canvas id="c8js-screen" width="640" height="320" ondblclick="emu.fullScreen(this)"></canvas>
+    <input type="file" id="rom-loader">
+    <button onclick="emu.pause()">Pause</button>
+    <button onclick="emu.resume()">Resume</button>
+    <button onclick="emu.enableAudio()">Enable Audio?</button>
+    <!--<button onclick="emu.reset()">Reset Emulator</button>-->
+    <!--<button onclick="emu.clearScreen()">Clear Screen</button> -->
+    <button onclick="debug(this)" style="background-color: red;">Debug Mode: OFF</button>
+    <button onclick="turbo(this)" style="background-color: red;">Turbo mode: OFF</button>
+    <label for="turboSlider">Turbo Speed:</label>
+    <input type="range" id="turboSlider" min="10" max="40" value="10">
+    <span id="turboValue">10</span>
+    <script src="src/c8js.js"></script>
+    <script>
+        const emu = new C8JS("c8js-screen", 10, false);
+        const slider = document.getElementById("turboSlider");
+        const turboValue = document.getElementById("turboValue");
+
+        document.getElementById('rom-loader').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = () => emu.loadROM(reader.result); emu.run();
+            reader.readAsArrayBuffer(file);
+        });
+
+        slider.addEventListener('input', function() {
+            emu.setTurboSpeed(parseInt(slider.value));
+            turboValue.innerText = slider.value;
+        });
+
+        function turbo(el) {
+            emu.toggleTurbo();
+            if (emu.turbo) {
+                el.innerText = 'Turbo mode: ON';
+                el.style.backgroundColor = 'green';
+            } else {
+                el.innerText = 'Turbo mode: OFF';
+                el.style.backgroundColor = 'red';
+            }
+        }
+
+        function debug(el) {
+            emu.debugMode = !emu.debugMode;
+            if (emu.debugMode) {
+                el.innerText = 'Debug Mode: ON';
+                el.style.backgroundColor = 'green';
+            } else {
+                el.innerText = 'Debug Mode: OFF';
+                el.style.backgroundColor = 'red';
+            }
+        }
+    </script>
+</body>
+</html>
